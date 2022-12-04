@@ -14,7 +14,10 @@ app.use(express.urlencoded({ extended: true }));
 
 
 //register
-app.use("/api/auth", userRoute);
+app.use('/api/auth', userRoute);
+
+//login
+app.use('/api/auth/login', userRoute);
 
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,

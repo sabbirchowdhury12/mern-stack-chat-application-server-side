@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/userModal');
 
 
+//register controll
 module.exports.register = async (req, res, next) => {
 
     try {
@@ -36,4 +37,27 @@ module.exports.register = async (req, res, next) => {
         console.log(err);
     }
 
+};
+
+//login controll
+module.exports.login = async (req, res, next) => {
+    try {
+
+        const { userName, email, password } = req.body;
+
+        const user = await User.findOne({ userName });
+        if (!user) {
+            return res.json({ status: false, message: "Invalid user name or password " });
+        }
+
+        const passwordValidation = await bcrypt.compare(password, user.password);
+        if (!passwordValidation) {
+            return res.json({ status: false, message: "Invalid user name or password " });
+        }
+        delete user.password;
+        return res.json({ status: true, user });
+    }
+    catch (error) {
+        next(error);
+    }
 };
