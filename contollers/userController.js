@@ -61,3 +61,24 @@ module.exports.login = async (req, res, next) => {
         next(error);
     }
 };
+
+//set Profile Image
+module.exports.setProfile = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const avartarImage = req.body.profileImage;
+
+        const result = await User.findByIdAndUpdate(id, {
+            isAvartarImageSet: true,
+            avartarImage
+        });
+
+        return res.json({
+            isSet: result.isAvartarImageSet,
+            image: result.avartarImage,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
