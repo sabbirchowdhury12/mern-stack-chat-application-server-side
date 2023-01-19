@@ -66,19 +66,38 @@ module.exports.login = async (req, res, next) => {
 module.exports.setProfile = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const avartarImage = req.body.profileImage;
+        const profileImage = req.body.profileImage;
 
         const result = await User.findByIdAndUpdate(id, {
-            isAvartarImageSet: true,
-            avartarImage
+            isprofileImageSet: true,
+            profileImage
         });
 
-        return res.json({
-            isSet: result.isAvartarImageSet,
-            image: result.avartarImage,
+        return res.send({
+            isSet: result.isprofileImageSet,
+            profile: result.profileImage,
         });
     }
     catch (err) {
         next(err);
+    }
+};
+
+//get all users
+module.exports.getAllUsers = async (req, res, next) => {
+    try {
+
+        const users = await User.find({ _id: { $ne: req.params.id } }).select([
+            "email",
+            "userName",
+            "profileImage",
+            "_id",
+        ]);
+
+        return res.json(users);
+    }
+    catch (err) {
+        next(err);
+        console.log(err);
     }
 };

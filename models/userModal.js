@@ -16,11 +16,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    isAvartarImageSet: {
+    isprofileImageSet: {
         type: Boolean,
         default: false
     },
-    avartarImage: {
+    profileImage: {
         type: String,
         default: '',
     }
