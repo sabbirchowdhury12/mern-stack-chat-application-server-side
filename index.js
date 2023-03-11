@@ -17,6 +17,8 @@ app.use(express.urlencoded({ extended: true }));
 
 //register
 app.use('/api/auth', userRoute);
+
+//message
 app.use('/api/messages', messageRoute);
 
 app.get('/', async (req, res) => {
