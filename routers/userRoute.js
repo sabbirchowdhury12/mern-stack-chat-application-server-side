@@ -5,7 +5,7 @@ const router = require('express').Router();
 router.post('/register', register);
 
 //login route
-// router.post('/login', login);
+router.post('/login', login);
 
 //set profile
 router.post('/profile/:id', setProfile);

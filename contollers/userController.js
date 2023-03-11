@@ -31,9 +31,10 @@ module.exports.register = async (req, res, next) => {
         };
 
         //delete user password 
-        const result = await Users.create(user);
+        delete user.password;
 
-        res.send({ result, user, status: true });
+        const result = await Users.create(user);
+        return res.send({ result, user, status: true });
 
     }
 
@@ -44,50 +45,31 @@ module.exports.register = async (req, res, next) => {
 
 //login controll
 module.exports.login = async (req, res, next) => {
+
     try {
+        const { userName, password } = req.body.user;
 
+        const user = await Users.findOne({ userName });
+
+        if (user) {
+            const { password: hashPassword } = user;
+            const passwordValidation = await bcrypt.compare(password, hashPassword);
+            delete user.password;
+            if (passwordValidation) {
+                return res.send({ status: true, user });
+            }
+            return res.json({ status: false, message: 'Invalid password' });
+        }
+
+        return res.json({ status: false, message: 'Account does not exit.' });
     }
-
-
-    //     const { userName, email, password } = req.body;
-
-    //     const user = await User.findOne({ userName });
-    //     if (!user) {
-    //         return res.json({ status: false, message: "Invalid user name or password " });
-    //     }
-
-    //     const passwordValidation = await bcrypt.compare(password, user.password);
-    //     if (!passwordValidation) {
-    //         return res.json({ status: false, message: "Invalid user name or password " });
-    //     }
-    //     delete user.password;
-    //     return res.json({ status: true, user });
-    // }
     catch (error) {
         next(error);
     }
 };
 
 //set Profile Image
-module.exports.setProfile = async (req, res, next) => {
-    try {
-        const id = req.params.id;
-        const profileImage = req.body.profileImage;
 
-        const result = await User.findByIdAndUpdate(id, {
-            isprofileImageSet: true,
-            profileImage
-        });
-
-        return res.send({
-            isSet: result.isprofileImageSet,
-            profile: result.profileImage,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-};
 
 //get all users
 module.exports.getAllUsers = async (req, res, next) => {
