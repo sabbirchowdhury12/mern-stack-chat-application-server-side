@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config();
+const socket = require('socket.io');
 const mongoose = require('mongoose');
 const userRoute = require('./routers/userRoute');
 const messageRoute = require('./routers/messageRoute');
@@ -25,8 +26,8 @@ app.get('/', async (req, res) => {
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then(() => {
-
+}).then((res) => {
+    // console.log('succedd');
 }).catch(err => console.log(err));
 
 
