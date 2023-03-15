@@ -23,9 +23,9 @@ module.exports.addMsg = async (req, res, next) => {
 
 
 module.exports.getAllMsg = async (req, res, next) => {
+
     try {
         const { from, to } = req.body;
-
         const messages = await Messages.find({
             users: {
                 $all: [from, to]
