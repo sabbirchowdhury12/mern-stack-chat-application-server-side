@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const Users = require('../models/userModel');
 const Token = require('../models/tokenModel');
 const { emailSend } = require('../utilities/emailSend');
+// const Messages = require('../models/messageModel');
 
 
 //register controll
@@ -31,6 +32,8 @@ module.exports.register = async (req, res, next) => {
         };
 
         const result = await Users.create(user);
+
+        user._id = result._id;
         //delete user password 
         delete user.password;
         return res.send({ user, status: true });
@@ -81,6 +84,7 @@ module.exports.login = async (req, res, next) => {
 module.exports.setProfile = async (req, res, next) => {
     try {
         const id = req.params.id;
+        console.log(id);
         const profileImage = req.body.profileImage;
 
         const result = await Users.findByIdAndUpdate(id, {
@@ -180,6 +184,12 @@ module.exports.resetPassword = async (req, res, next) => {
 module.exports.getAllUsers = async (req, res, next) => {
     try {
 
+        const decoded = req.decoded;
+        console.log(decoded);
+        // if (decoded.email !== req.query.email) {
+        //     return res.status(401).send({ message: "anathorizrd access" });
+        // }
+
         const users = await Users.find({ _id: { $ne: req.params.id } }).select([
             "email",
             "userName",
@@ -194,3 +204,7 @@ module.exports.getAllUsers = async (req, res, next) => {
         console.log(err);
     }
 };
+
+
+// message controller ...........
+

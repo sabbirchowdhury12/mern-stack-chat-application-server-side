@@ -20,12 +20,10 @@ const tokenSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now(),
-        expires: '2m'
     }
 },
     {
         versionKey: false,
-        timestamps: true
     });
 
 module.exports = mongoose.model("Token", tokenSchema);

@@ -7,6 +7,7 @@ const http = require("http");
 const mongoose = require('mongoose');
 const userRoute = require('./routers/userRoute');
 const messageRoute = require('./routers/messageRoute');
+const jwt = require('jsonwebtoken');
 
 
 // middleware 
@@ -24,6 +25,24 @@ app.get('/', async (req, res) => {
     res.send('Home Page');
 });
 
+
+// implement jwt----------------
+app.use('/jwt', async (req, res) => {
+    const user = {
+        name: req.body.name,
+        email: req.body.email
+    };
+
+    console.log(user);
+
+    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1hr' });
+
+    res.status(200).json({ token: token });
+});
+
+
+
+
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -32,7 +51,7 @@ mongoose.connect(process.env.MONGO_URL, {
 }).catch(err => console.log(err));
 
 
-const server = app.listen(process.env.PORT, () => {
+const server = app.listen(5000, () => {
     console.log(`Server running on Port ${process.env.port}`);
 });
 
@@ -64,11 +83,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("send-msg", (data) => {
-        console.log('data', data);
+        // console.log('data', data);
         const sendUserSocket = onlineUsers.get(data.to);
         console.log('sendUserSocket', sendUserSocket);
         if (sendUserSocket) {
-            console.log(data.message);
+            // console.log(data.message);
             socket.to(sendUserSocket).emit("msg-recived", data.message);
         }
     });

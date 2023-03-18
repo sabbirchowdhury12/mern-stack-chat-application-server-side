@@ -1,3 +1,5 @@
+// const { addMsg, getAllMsg } = require('../contollers/userController');
+
 const { addMsg, getAllMsg } = require('../contollers/messageController');
 const router = require('express').Router();
 
