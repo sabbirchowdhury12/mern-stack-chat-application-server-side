@@ -11,6 +11,7 @@ const { emailSend } = require('../utilities/emailSend');
 module.exports.register = async (req, res, next) => {
     try {
         const { userName, email, password } = req.body;
+        // console.log(userName, email, password);
         // check email and password 
         const CheckUserName = await Users.findOne({ userName });
         const checkEmail = await Users.findOne({ email });
@@ -84,14 +85,14 @@ module.exports.login = async (req, res, next) => {
 module.exports.setProfile = async (req, res, next) => {
     try {
         const id = req.params.id;
-        console.log(id);
         const profileImage = req.body.profileImage;
-
         const result = await Users.findByIdAndUpdate(id, {
             isProfileImageSet: true,
             profileImage
-        });
-
+        },
+            { new: true }
+        );
+        console.log(result);
         return res.send({
             isSet: result.isProfileImageSet,
             profile: result.profileImage,
@@ -183,10 +184,9 @@ module.exports.resetPassword = async (req, res, next) => {
 //get all users
 module.exports.getAllUsers = async (req, res, next) => {
     try {
-
-        const decoded = req.decoded;
-        console.log(decoded);
-        // if (decoded.email !== req.query.email) {
+        // const decoded = req.decoded;
+        // console.log(decoded);
+        // if (decoded.email !== req.headers.email) {
         //     return res.status(401).send({ message: "anathorizrd access" });
         // }
 
@@ -206,5 +206,5 @@ module.exports.getAllUsers = async (req, res, next) => {
 };
 
 
-// message controller ...........
+
 

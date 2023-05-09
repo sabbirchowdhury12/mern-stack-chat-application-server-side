@@ -33,7 +33,6 @@ app.use('/jwt', async (req, res) => {
         email: req.body.email
     };
 
-    console.log(user);
 
     const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1hr' });
 

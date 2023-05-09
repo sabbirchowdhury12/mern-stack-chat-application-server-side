@@ -17,6 +17,6 @@ router.post('/resetPassword', resetPassword);
 router.post('/profile/:id', setProfile);
 
 //getAllUser
-router.get('/allusers/:id', verfyJWT, getAllUsers);
+router.get('/allusers/:id', getAllUsers);
 
 module.exports = router;
