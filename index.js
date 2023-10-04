@@ -1,95 +1,83 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const cors = require('cors');
-require('dotenv').config();
-const socket = require('socket.io');
+const cors = require("cors");
+require("dotenv").config();
+const socket = require("socket.io");
 const http = require("http");
-const mongoose = require('mongoose');
-const userRoute = require('./routers/userRoute');
-const messageRoute = require('./routers/messageRoute');
-const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
+const userRoute = require("./routers/userRoute");
+const messageRoute = require("./routers/messageRoute");
+const jwt = require("jsonwebtoken");
 
-
-// middleware 
+// middleware
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //register
-app.use('/api/auth', userRoute);
+app.use("/api/auth", userRoute);
 
 //message
-app.use('/api/messages', messageRoute);
+app.use("/api/messages", messageRoute);
 
-app.get('/', async (req, res) => {
-    res.send('Home Page');
+app.get("/", async (req, res) => {
+  res.send("Home Page");
 });
-
 
 // implement jwt----------------
-app.use('/jwt', async (req, res) => {
-    const user = {
-        name: req.body.name,
-        email: req.body.email
-    };
+app.use("/jwt", async (req, res) => {
+  const user = {
+    name: req.body.name,
+    email: req.body.email,
+  };
 
+  const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
+    expiresIn: "1hr",
+  });
 
-    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, { expiresIn: '1hr' });
-
-    res.status(200).json({ token: token });
+  res.status(200).json({ token: token });
 });
 
-
-
-
-mongoose.connect(process.env.MONGO_URL, {
+mongoose
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then((res) => {
+    useUnifiedTopology: true,
+  })
+  .then((res) => {
     // console.log('succedd');
-}).catch(err => console.log(err));
-
+  })
+  .catch((err) => console.log(err));
 
 const server = app.listen(5000, () => {
-    console.log(`Server running on Port ${process.env.port}`);
+  console.log(`Server running on Port ${process.env.port}`);
 });
-
-
 
 // const server = http.createServer(app);
 // socket.io----------------
 
 const io = socket(server, {
-    cors: {
-        origin: 'http://localhost:3000',
-        credentials: true,
-        // methods: ['GET', 'POST'],
-        // allowedHeaders: ["my-custom-header"],
-    },
-    // allowRequest: (req, callback) => {
-    //     const noOriginHeader = req.headers.origin === undefined;
-    //     callback(null, noOriginHeader);
-    // }
+  cors: {
+    origin:
+      "https://sabbirchowdhury12.github.io/-mern-stack-chat-application-client-side",
+  },
 });
 
 global.onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-    global.chatSocket = socket;
-    socket.on("add-user", (userId) => {
-        onlineUsers.set(userId, socket.id);
-        // console.log(userId, socket.id);
-    });
+  global.chatSocket = socket;
+  socket.on("add-user", (userId) => {
+    onlineUsers.set(userId, socket.id);
+    // console.log(userId, socket.id);
+  });
 
-    socket.on("send-msg", (data) => {
-        // console.log('data', data);
-        const sendUserSocket = onlineUsers.get(data.to);
-        console.log('sendUserSocket', sendUserSocket);
-        if (sendUserSocket) {
-            // console.log(data.message);
-            socket.to(sendUserSocket).emit("msg-recived", data.message);
-        }
-    });
-})
-
-
+  socket.on("send-msg", (data) => {
+    // console.log('data', data);
+    const sendUserSocket = onlineUsers.get(data.to);
+    console.log("sendUserSocket", sendUserSocket);
+    if (sendUserSocket) {
+      // console.log(data.message);
+      socket.to(sendUserSocket).emit("msg-recived", data.message);
+    }
+  });
+});
