@@ -57,8 +57,7 @@ const server = app.listen(5000, () => {
 
 const io = socket(server, {
   cors: {
-    origin:
-      "https://sabbirchowdhury12.github.io/-mern-stack-chat-application-client-side",
+    origin: "https://sabbirchowdhury12.github.io",
   },
 });
 
