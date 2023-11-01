@@ -57,7 +57,7 @@ const server = app.listen(5000, () => {
 
 const io = socket(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://mern-stack-chat-app.netlify.app",
   },
 });
 
