@@ -1,22 +1,29 @@
-const { register, login, setProfile, getAllUsers, emailSend, resetPassword } = require('../contollers/userController');
-const { verfyJWT } = require('../utilities/jwtMidleware');
-const router = require('express').Router();
+const {
+  register,
+  login,
+  setProfile,
+  getAllUsers,
+  sendToken,
+  resetPassword,
+} = require("../contollers/userController");
+const { verfyJWT } = require("../helpers/jwtMidleware");
+const router = require("express").Router();
 
 //register route
-router.post('/register', register);
+router.post("/register", register);
 
 //login route
-router.post('/login', login);
+router.post("/login", login);
 
 //reset email password
-router.post('/email', emailSend);
+router.post("/send-token", sendToken);
 
-router.post('/resetPassword', resetPassword);
+router.post("/resetPassword", resetPassword);
 
 //set profile
-router.post('/profile/:id', setProfile);
+router.post("/profile/:id", setProfile);
 
 //getAllUser
-router.get('/allusers/:id', getAllUsers);
+router.get("/allusers/:id", getAllUsers);
 
 module.exports = router;

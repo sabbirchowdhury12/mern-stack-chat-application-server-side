@@ -1,29 +1,36 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const tokenSchema = new mongoose.Schema({
-
+const tokenSchema = new mongoose.Schema(
+  {
     email: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      required: true,
+      unique: true,
     },
     userID: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        unique: true
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+    },
+    token: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
 
-    token: {
-        type: String,
-        required: true
+    expireAt: {
+      type: Date,
+      default: () => Date.now() + 300000,
     },
-    // createdAt: {
-    //     type: Date,
-    //     default: Date.now(),
-    // }
-},
-    {
-        versionKey: false,
-    });
+  },
+  {
+    versionKey: false,
+  }
+);
+
+tokenSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model("Token", tokenSchema);
