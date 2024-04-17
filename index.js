@@ -11,7 +11,11 @@ const jwt = require("jsonwebtoken");
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000"],
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 
 //register
@@ -57,7 +61,10 @@ const server = app.listen(5000, () => {
 
 const io = socket(server, {
   cors: {
-    origin: "https://mern-stack-chat-app.netlify.app",
+    origin: [
+      "https://mern-stack-chat-app.netlify.app",
+      "http://localhost:3000",
+    ],
   },
 });
 
@@ -73,7 +80,7 @@ io.on("connection", (socket) => {
   socket.on("send-msg", (data) => {
     // console.log('data', data);
     const sendUserSocket = onlineUsers.get(data.to);
-    console.log("sendUserSocket", sendUserSocket);
+    // console.log("sendUserSocket", sendUserSocket);
     if (sendUserSocket) {
       // console.log(data.message);
       socket.to(sendUserSocket).emit("msg-recived", data.message);
