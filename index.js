@@ -11,88 +11,92 @@ const jwt = require("jsonwebtoken");
 
 // middleware
 app.use(express.json());
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
-//register
+// Configure CORS
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+// register route
 app.use("/api/auth", userRoute);
 
-//message
+// message route
 app.use("/api/messages", messageRoute);
 
 app.get("/", async (req, res) => {
   res.send("Home Page");
 });
 
-// implement jwt----------------
-app.use("/jwt", async (req, res) => {
+// JWT token route
+app.post("/jwt", (req, res) => {
   const user = {
     name: req.body.name,
     email: req.body.email,
   };
 
-  const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
-    expiresIn: "1hr",
-  });
-
-  res.status(200).json({ token: token });
+  try {
+    const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    res.status(200).json({ token });
+  } catch (err) {
+    res.status(500).json({ error: "Token generation failed" });
+  }
 });
 
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then((res) => {
-    // console.log('succedd');
+  .then(() => {
+    console.log("MongoDB connected successfully");
   })
   .catch((err) => console.log(err));
 
-const server = app.listen(5000, () => {
-  console.log(`Server running on Port ${process.env.port}`);
+// Start the server
+const server = app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server running on Port ${process.env.PORT || 5000}`);
 });
 
-// const server = http.createServer(app);
-// socket.io----------------
-
+// Socket.IO setup
 global.onlineUsers = new Map();
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
+    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
 let users = {};
 
 io.on("connection", (socket) => {
-  // console.log(`User connected: ${socket.id}`);
-
+  // Add user to the online users map
   socket.on("add-user", (userId) => {
     users[userId] = socket.id;
-    // console.log(`User added: ${userId}, Socket ID: ${socket.id}`);
   });
 
   // Handle sending messages
   socket.on("send-msg", (data) => {
-    // console.log(`Message received from: ${data.from} to: ${data.to}`);
-    // console.log(`Receiver's socket ID: ${users[data.to]}`);
-
     const receiverSocketId = users[data.to];
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("msg-recived", data.message);
-      // console.log(`Message sent from: ${data.from} to: ${data.to}`);
-    } else {
-      // console.log(`Receiver's socket ID is undefined for user: ${data.to}`);
     }
   });
 
+  // Handle user disconnection
   socket.on("disconnect", () => {
-    // console.log(`User disconnected: ${socket.id}`);
     for (const [userId, socketId] of Object.entries(users)) {
       if (socketId === socket.id) {
         delete users[userId];
-        // console.log(`User removed: ${userId}`);
         break;
       }
     }
