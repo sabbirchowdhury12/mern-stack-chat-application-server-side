@@ -16,7 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 // Configure CORS
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
+    origin: [
+      "http://localhost:3000",
+      "https://chat-application-five-virid.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -70,7 +73,10 @@ global.onlineUsers = new Map();
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://your-frontend-domain.com"],
+    origin: [
+      "http://localhost:3000",
+      "https://chat-application-five-virid.vercel.app",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
