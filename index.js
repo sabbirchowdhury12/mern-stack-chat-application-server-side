@@ -55,28 +55,46 @@ const server = app.listen(5000, () => {
 // const server = http.createServer(app);
 // socket.io----------------
 
-const io = socket(server, {
+global.onlineUsers = new Map();
+
+const io = require("socket.io")(server, {
   cors: {
-    origin: "https://mern-stack-chat-app.netlify.app",
+    origin: "*",
   },
 });
 
-global.onlineUsers = new Map();
+let users = {};
 
 io.on("connection", (socket) => {
-  global.chatSocket = socket;
+  // console.log(`User connected: ${socket.id}`);
+
   socket.on("add-user", (userId) => {
-    onlineUsers.set(userId, socket.id);
-    // console.log(userId, socket.id);
+    users[userId] = socket.id;
+    // console.log(`User added: ${userId}, Socket ID: ${socket.id}`);
   });
 
+  // Handle sending messages
   socket.on("send-msg", (data) => {
-    // console.log('data', data);
-    const sendUserSocket = onlineUsers.get(data.to);
-    console.log("sendUserSocket", sendUserSocket);
-    if (sendUserSocket) {
-      // console.log(data.message);
-      socket.to(sendUserSocket).emit("msg-recived", data.message);
+    // console.log(`Message received from: ${data.from} to: ${data.to}`);
+    // console.log(`Receiver's socket ID: ${users[data.to]}`);
+
+    const receiverSocketId = users[data.to];
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("msg-recived", data.message);
+      // console.log(`Message sent from: ${data.from} to: ${data.to}`);
+    } else {
+      // console.log(`Receiver's socket ID is undefined for user: ${data.to}`);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    // console.log(`User disconnected: ${socket.id}`);
+    for (const [userId, socketId] of Object.entries(users)) {
+      if (socketId === socket.id) {
+        delete users[userId];
+        // console.log(`User removed: ${userId}`);
+        break;
+      }
     }
   });
 });
