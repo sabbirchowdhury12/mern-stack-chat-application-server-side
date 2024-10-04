@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://chat-application-five-virid.vercel.app",
+      "https://chat-app-sabbirchowdhury12.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
@@ -75,7 +75,7 @@ const io = require("socket.io")(server, {
   cors: {
     origin: [
       "http://localhost:3000",
-      "https://chat-application-five-virid.vercel.app",
+      "https://chat-app-sabbirchowdhury12.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
